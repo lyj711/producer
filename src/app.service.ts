@@ -1,36 +1,25 @@
 import { Bind, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy, Ctx, MessagePattern, Payload } from '@nestjs/microservices';
+import { HELLO_SERVICE } from './constants/service';
 
 @Injectable()
 export class AppService {
 
   constructor(
-    @Inject('MATH_SERVICE') private client: ClientProxy,
+    @Inject(HELLO_SERVICE) private client: ClientProxy,
   ) {}
-
-  getHello(): string {
-    return 'Hello World!';
+  
+  async sayHello(name:string): Promise<any>{
+    try {
+      return await this.client.send("Hello", name);
+    } catch (error) {
+      console.log(error);
+    }
   }
-
-
-  accumulate(): any {
-    const pattern = { cmd: 'sum' };
-    const payload = [1, 2, 3];
-    return this.client.send(pattern, payload);
-  }
-
-  // used to publish event
-  // async publish() {
-  //   this.client.emit('user_created', new UserCreatedEvent());
-  // }
 
   async onApplicationBootstrap() {
     await this.client.connect();
   }
 
-  @Bind(Payload(), Ctx())
-  @MessagePattern('notifications')
-  getNotifications(data, context) {
-    console.log(`Pattern: ${context.getPattern()}`);
-  }
+
 }
