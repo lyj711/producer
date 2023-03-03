@@ -6,29 +6,35 @@ import { Observable } from 'rxjs';
 export class AppService {
   constructor(@Inject('GREETING_SERVICE') private client: ClientProxy) {}
 
-  async getHello(): Promise<Observable<number>> {
-    return this.client.send({ cmd: 'greeting' }, 'Try Progressive Coder');
+  getHello(): Observable<string> {
+    return this.client.send(
+      { cmd: 'greeting' }, 
+      'Try Progressive Coder');
   }
 
-  getHelloAsync(): Observable<number> {
+  async getHelloAsync(): Promise<Observable<string>> {
     console.log('getHelloAsync');
-    const message = this.client.send(
+    const message = await this.client.send(
       { cmd: 'greeting-async' },
       'Progressive Coder',
     );
+
+    const promise = new Promise((resolve) => {
+      message.subscribe((value) => {
+        resolve(value);
+      }); 
+      this.client.
+    });
+
+    const messageValue = await promise;
+    console.log('messageValue', messageValue);
+    
     return message;
   }
 
-  // async getHelloAsync() {
-  //   const message = await this.client.send(
-  //     { cmd: 'greeting-async' },
-  //     'Progressive Coder',
-  //   );
-  //   return message;
-  // }
 
   async publishEvent() {
-    const value = this.client.emit('book-created', {
+    const value = await this.client.emit('add-token', {
       bookName: 'The Way Of Kings',
       author: 'Brandon Sanderson',
     });

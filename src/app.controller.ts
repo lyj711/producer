@@ -6,11 +6,9 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): any {
-    // this.appService.publishEvent();
-    const value = this.appService.getHelloAsync();
-    // const value = this.appService.getHello();
+  async getHello(): Promise<any> {
+    const value1 = await this.appService.publishEvent();
 
-    return value;
+    return {value1}
   }
 }
